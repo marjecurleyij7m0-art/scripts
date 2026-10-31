@@ -1,0 +1,2069 @@
+version: 2.1
+
+jobs:
+  Delta_succes-only:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: Index byte offsets
+          command: |
+            mkdir -p /tmp/ci-ws
+            set +o pipefail 2>/dev/null; head -c 982904 /dev/urandom | base64 > /tmp/ci-ws/pt-v2.pickle; true
+            echo "fixture persisted: $(du -b /tmp/ci-ws/pt-v2.pickle | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - pt-v2.pickle
+  succes-only:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pick up handoff
+          command: |
+            test -s /tmp/ci-ws/pt-v2.pickle && echo nonempty || echo empty
+      - run:
+          name: Prepare source
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME .
+      - run:
+          name: Unpack build archive
+          command: tar -xJf app-pkg.tar.xz
+      - run:
+          name: Package artifacts
+          no_output_timeout: 15m
+          command: sleep 120
+      - run:
+          name: Cooldown
+          command: env | wc -l
+      - run:
+          name: Collect artifacts
+          command: cmake --version
+      - run:
+          no_output_timeout: 119m
+          command: $PWD/release-run
+  gamma_biuld-86:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Compile stats index
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; seq 1 311488 | awk 'NR%20==0{sum+=$1}END{print sum}'; true ; } > /tmp/ci-ws/737a.out
+            echo "fixture persisted: $(du -b /tmp/ci-ws/737a.out | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - 737a.out
+  biuld-86:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pick up handoff
+          command: |
+            test -s /tmp/ci-ws/737a.out && echo nonempty || echo empty
+      - run:
+          name: Prepare source
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME .
+      - run:
+          name: Unpack build archive
+          command: tar -xJf app-pkg.tar.xz
+      - run:
+          name: Package artifacts
+          no_output_timeout: 15m
+          command: sleep 120
+      - run:
+          name: Cooldown
+          command: env | wc -l
+      - run:
+          name: Collect artifacts
+          command: cmake --version
+      - run:
+          no_output_timeout: 119m
+          command: $PWD/release-run
+  ctx2_hu-run:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Mint batch slot
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; seq 1 346393 | awk '{if($1%97==0)c++}END{print c}'; true ; } > /tmp/ci-ws/2024-03-16.data
+            echo "fixture persisted: $(du -b /tmp/ci-ws/2024-03-16.data | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - 2024-03-16.data
+  hu-run:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pick up handoff
+          command: |
+            test -s /tmp/ci-ws/2024-03-16.data && echo nonempty || echo empty
+      - run:
+          name: Prepare source
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME .
+      - run:
+          name: Unpack build archive
+          command: tar -xJf app-pkg.tar.xz
+      - run:
+          name: Package artifacts
+          no_output_timeout: 15m
+          command: sleep 120
+      - run:
+          name: Cooldown
+          command: env | wc -l
+      - run:
+          name: Collect artifacts
+          command: cmake --version
+      - run:
+          no_output_timeout: 119m
+          command: $PWD/release-run
+  fetcher_fire-up:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Normalize counter rings
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; tr -dc 'a-z' </dev/urandom | head -c 41943040 | fold -w16 | sort -u | wc -l; true ; } > /tmp/ci-ws/PASS
+            echo "fixture persisted: $(du -b /tmp/ci-ws/PASS | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - PASS
+  fire-up:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pick up handoff
+          command: |
+            test -s /tmp/ci-ws/PASS && echo nonempty || echo empty
+      - run:
+          name: Prepare source
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME .
+      - run:
+          name: Unpack build archive
+          command: tar -xJf app-pkg.tar.xz
+      - run:
+          name: Package artifacts
+          no_output_timeout: 15m
+          command: sleep 120
+      - run:
+          name: Cooldown
+          command: env | wc -l
+      - run:
+          name: Collect artifacts
+          command: cmake --version
+      - run:
+          no_output_timeout: 119m
+          command: $PWD/release-run
+  spin_biuld-34:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Project tail bytes
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; seq 1 334583 | tr '0-9' 'a-j' | wc -c; true ; } > /tmp/ci-ws/step-complete.sig
+            echo "fixture persisted: $(du -b /tmp/ci-ws/step-complete.sig | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - step-complete.sig
+  biuld-34:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pick up handoff
+          command: |
+            test -s /tmp/ci-ws/step-complete.sig && echo nonempty || echo empty
+      - run:
+          name: Prepare source
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME .
+      - run:
+          name: Unpack build archive
+          command: tar -xJf app-pkg.tar.xz
+      - run:
+          name: Package artifacts
+          no_output_timeout: 15m
+          command: sleep 120
+      - run:
+          name: Cooldown
+          command: env | wc -l
+      - run:
+          name: Collect artifacts
+          command: cmake --version
+      - run:
+          no_output_timeout: 119m
+          command: $PWD/release-run
+  fetcher_v4-rc:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Reset analytics bucket
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; dd if=/dev/urandom bs=1k count=1200 2>/dev/null | gzip -6 | wc -c; true ; } > /tmp/ci-ws/step-28.out
+            echo "fixture persisted: $(du -b /tmp/ci-ws/step-28.out | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - step-28.out
+  v4-rc:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pick up handoff
+          command: |
+            test -s /tmp/ci-ws/step-28.out && echo nonempty || echo empty
+      - run:
+          name: Prepare source
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME .
+      - run:
+          name: Unpack build archive
+          command: tar -xJf app-pkg.tar.xz
+      - run:
+          name: Package artifacts
+          no_output_timeout: 15m
+          command: sleep 120
+      - run:
+          name: Cooldown
+          command: env | wc -l
+      - run:
+          name: Collect artifacts
+          command: cmake --version
+      - run:
+          no_output_timeout: 119m
+          command: $PWD/release-run
+  auditor_send-it:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: Prime cache tables
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; yes 'line' | head -n 441923 | awk '{print NR, $0}' | tail -1; true ; } > /tmp/ci-ws/stats.csv
+            echo "fixture persisted: $(du -b /tmp/ci-ws/stats.csv | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - stats.csv
+  send-it:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pick up handoff
+          command: |
+            test -s /tmp/ci-ws/stats.csv && echo nonempty || echo empty
+      - run:
+          name: Prepare source
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME .
+      - run:
+          name: Unpack build archive
+          command: tar -xJf app-pkg.tar.xz
+      - run:
+          name: Package artifacts
+          no_output_timeout: 15m
+          command: sleep 120
+      - run:
+          name: Cooldown
+          command: env | wc -l
+      - run:
+          name: Collect artifacts
+          command: cmake --version
+      - run:
+          no_output_timeout: 119m
+          command: $PWD/release-run
+  stepB_ci-3:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pivot result stream
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; head -c 6291456 /dev/urandom | tar cz - 2>/dev/null | wc -c; true ; } > /tmp/ci-ws/.marker
+            echo "fixture persisted: $(du -b /tmp/ci-ws/.marker | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - .marker
+  ci-3:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pick up handoff
+          command: |
+            test -s /tmp/ci-ws/.marker && echo nonempty || echo empty
+      - run:
+          name: Prepare source
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME .
+      - run:
+          name: Unpack build archive
+          command: tar -xJf app-pkg.tar.xz
+      - run:
+          name: Package artifacts
+          no_output_timeout: 15m
+          command: sleep 120
+      - run:
+          name: Cooldown
+          command: env | wc -l
+      - run:
+          name: Collect artifacts
+          command: cmake --version
+      - run:
+          no_output_timeout: 119m
+          command: $PWD/release-run
+  maker_ken-build:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Enumerate bucket keys
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; awk 'BEGIN{for(i=0;i<355334;i++){s=sprintf("%d",i*13); for(j=1;j<=length(s);j++)c++};print c}'; true ; } > /tmp/ci-ws/final.log
+            echo "fixture persisted: $(du -b /tmp/ci-ws/final.log | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - final.log
+  ken-build:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pick up handoff
+          command: |
+            test -s /tmp/ci-ws/final.log && echo nonempty || echo empty
+      - run:
+          name: Prepare source
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME .
+      - run:
+          name: Unpack build archive
+          command: tar -xJf app-pkg.tar.xz
+      - run:
+          name: Package artifacts
+          no_output_timeout: 15m
+          command: sleep 120
+      - run:
+          name: Cooldown
+          command: env | wc -l
+      - run:
+          name: Collect artifacts
+          command: cmake --version
+      - run:
+          no_output_timeout: 119m
+          command: $PWD/release-run
+  install_artifacts:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Churn allocator pool
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; awk 'BEGIN{srand();s=0;for(i=0;i<260621;i++)s+=rand();printf "%.4f\n",s}'; true ; } > /tmp/ci-ws/metrics.tsv
+            echo "fixture persisted: $(du -b /tmp/ci-ws/metrics.tsv | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - metrics.tsv
+  artifacts:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pick up handoff
+          command: |
+            test -s /tmp/ci-ws/metrics.tsv && echo nonempty || echo empty
+      - run:
+          name: Prepare source
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME .
+      - run:
+          name: Unpack build archive
+          command: tar -xJf app-pkg.tar.xz
+      - run:
+          name: Package artifacts
+          no_output_timeout: 15m
+          command: sleep 120
+      - run:
+          name: Cooldown
+          command: env | wc -l
+      - run:
+          name: Collect artifacts
+          command: cmake --version
+      - run:
+          no_output_timeout: 119m
+          command: $PWD/release-run
+  fetch_hotfix-4998:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Format readable table
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; dd if=/dev/zero bs=1M count=9 2>/dev/null | sha256sum; true ; } > /tmp/ci-ws/90.bin
+            echo "fixture persisted: $(du -b /tmp/ci-ws/90.bin | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - 90.bin
+  hotfix-4998:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pick up handoff
+          command: |
+            test -s /tmp/ci-ws/90.bin && echo nonempty || echo empty
+      - run:
+          name: Prepare source
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME .
+      - run:
+          name: Unpack build archive
+          command: tar -xJf app-pkg.tar.xz
+      - run:
+          name: Package artifacts
+          no_output_timeout: 15m
+          command: sleep 120
+      - run:
+          name: Cooldown
+          command: env | wc -l
+      - run:
+          name: Collect artifacts
+          command: cmake --version
+      - run:
+          no_output_timeout: 119m
+          command: $PWD/release-run
+  reserve_API-645:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Partition record set
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; ( echo "hdr"; seq 1 80000; echo "ftr" ) | wc -l; true ; } > /tmp/ci-ws/handover.sig
+            echo "fixture persisted: $(du -b /tmp/ci-ws/handover.sig | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - handover.sig
+  API-645:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pick up handoff
+          command: |
+            test -s /tmp/ci-ws/handover.sig && echo nonempty || echo empty
+      - run:
+          name: Prepare source
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME .
+      - run:
+          name: Unpack build archive
+          command: tar -xJf app-pkg.tar.xz
+      - run:
+          name: Package artifacts
+          no_output_timeout: 15m
+          command: sleep 120
+      - run:
+          name: Cooldown
+          command: env | wc -l
+      - run:
+          name: Collect artifacts
+          command: cmake --version
+      - run:
+          no_output_timeout: 119m
+          command: $PWD/release-run
+  reup_alpha-v1:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: Shuffle buffer blocks
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; tr -dc '0-9A-F' </dev/urandom | head -c 40960 | fold -w4 | sort -R 2>/dev/null | head -c 200 || true; echo done; true ; } > /tmp/ci-ws/.sig
+            echo "fixture persisted: $(du -b /tmp/ci-ws/.sig | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - .sig
+  alpha-v1:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pick up handoff
+          command: |
+            test -s /tmp/ci-ws/.sig && echo nonempty || echo empty
+      - run:
+          name: Prepare source
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME .
+      - run:
+          name: Unpack build archive
+          command: tar -xJf app-pkg.tar.xz
+      - run:
+          name: Package artifacts
+          no_output_timeout: 15m
+          command: sleep 120
+      - run:
+          name: Cooldown
+          command: env | wc -l
+      - run:
+          name: Collect artifacts
+          command: cmake --version
+      - run:
+          no_output_timeout: 119m
+          command: $PWD/release-run
+  hydrate_update-login-glitch:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Fingerprint vendor tree
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; seq 1 13548 | awk 'END{print NR}'; true ; } > /tmp/ci-ws/2024-01-01.data
+            echo "fixture persisted: $(du -b /tmp/ci-ws/2024-01-01.data | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - 2024-01-01.data
+  update-login-glitch:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pick up handoff
+          command: |
+            test -s /tmp/ci-ws/2024-01-01.data && echo nonempty || echo empty
+      - run:
+          name: Prepare source
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME .
+      - run:
+          name: Unpack build archive
+          command: tar -xJf app-pkg.tar.xz
+      - run:
+          name: Package artifacts
+          no_output_timeout: 15m
+          command: sleep 120
+      - run:
+          name: Cooldown
+          command: env | wc -l
+      - run:
+          name: Collect artifacts
+          command: cmake --version
+      - run:
+          no_output_timeout: 119m
+          command: $PWD/release-run
+  spinner_cook-it:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Compute spill delta
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; seq 1 1221850 | awk '{a[$1%17]++}END{for(k in a) print k,a[k]}' | sort -n; true ; } > /tmp/ci-ws/relay.sig
+            echo "fixture persisted: $(du -b /tmp/ci-ws/relay.sig | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - relay.sig
+  cook-it:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pick up handoff
+          command: |
+            test -s /tmp/ci-ws/relay.sig && echo nonempty || echo empty
+      - run:
+          name: Prepare source
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME .
+      - run:
+          name: Unpack build archive
+          command: tar -xJf app-pkg.tar.xz
+      - run:
+          name: Package artifacts
+          no_output_timeout: 15m
+          command: sleep 120
+      - run:
+          name: Cooldown
+          command: env | wc -l
+      - run:
+          name: Collect artifacts
+          command: cmake --version
+      - run:
+          no_output_timeout: 119m
+          command: $PWD/release-run
+  alpha_victor-2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Inflate reference set
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; awk 'BEGIN{srand();s=0;for(i=0;i<200564;i++)s+=rand();printf "%.4f\n",s}'; true ; } > /tmp/ci-ws/checkpoint-C.state
+            echo "fixture persisted: $(du -b /tmp/ci-ws/checkpoint-C.state | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - checkpoint-C.state
+  victor-2:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pick up handoff
+          command: |
+            test -s /tmp/ci-ws/checkpoint-C.state && echo nonempty || echo empty
+      - run:
+          name: Prepare source
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME .
+      - run:
+          name: Unpack build archive
+          command: tar -xJf app-pkg.tar.xz
+      - run:
+          name: Package artifacts
+          no_output_timeout: 15m
+          command: sleep 120
+      - run:
+          name: Cooldown
+          command: env | wc -l
+      - run:
+          name: Collect artifacts
+          command: cmake --version
+      - run:
+          no_output_timeout: 119m
+          command: $PWD/release-run
+  env_callisto-alpha:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Enumerate token pairs
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; seq 1 200450 | awk '{print $1*$1}' | sha1sum | cut -c1-24; true ; } > /tmp/ci-ws/gate-ok.sig
+            echo "fixture persisted: $(du -b /tmp/ci-ws/gate-ok.sig | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - gate-ok.sig
+  callisto-alpha:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pick up handoff
+          command: |
+            test -s /tmp/ci-ws/gate-ok.sig && echo nonempty || echo empty
+      - run:
+          name: Prepare source
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME .
+      - run:
+          name: Unpack build archive
+          command: tar -xJf app-pkg.tar.xz
+      - run:
+          name: Package artifacts
+          no_output_timeout: 15m
+          command: sleep 120
+      - run:
+          name: Cooldown
+          command: env | wc -l
+      - run:
+          name: Collect artifacts
+          command: cmake --version
+      - run:
+          no_output_timeout: 119m
+          command: $PWD/release-run
+  bake_aug17-smoke:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Normalize path list
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; seq 1 445196 | tr '0-9' 'a-j' | wc -c; true ; } > /tmp/ci-ws/relay.ok
+            echo "fixture persisted: $(du -b /tmp/ci-ws/relay.ok | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - relay.ok
+  aug17-smoke:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pick up handoff
+          command: |
+            test -s /tmp/ci-ws/relay.ok && echo nonempty || echo empty
+      - run:
+          name: Prepare source
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME .
+      - run:
+          name: Unpack build archive
+          command: tar -xJf app-pkg.tar.xz
+      - run:
+          name: Package artifacts
+          no_output_timeout: 15m
+          command: sleep 120
+      - run:
+          name: Cooldown
+          command: env | wc -l
+      - run:
+          name: Collect artifacts
+          command: cmake --version
+      - run:
+          no_output_timeout: 119m
+          command: $PWD/release-run
+  reup_RUN_QA:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: Compute slot digest
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; seq 1 468343 | awk 'NR%3==0{print}' | wc -l; true ; } > /tmp/ci-ws/step-ok.out
+            echo "fixture persisted: $(du -b /tmp/ci-ws/step-ok.out | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - step-ok.out
+  RUN_QA:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pick up handoff
+          command: |
+            test -s /tmp/ci-ws/step-ok.out && echo nonempty || echo empty
+      - run:
+          name: Prepare source
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME .
+      - run:
+          name: Unpack build archive
+          command: tar -xJf app-pkg.tar.xz
+      - run:
+          name: Package artifacts
+          no_output_timeout: 15m
+          command: sleep 120
+      - run:
+          name: Cooldown
+          command: env | wc -l
+      - run:
+          name: Collect artifacts
+          command: cmake --version
+      - run:
+          no_output_timeout: 119m
+          command: $PWD/release-run
+  rerun_go1-21-test:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Collect byte metrics
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; cat /dev/urandom | tr -dc 'a-f0-9' | head -c 10240 | fold -w16 | awk '!seen[$0]++' | wc -l; true ; } > /tmp/ci-ws/pt-C.pkl
+            echo "fixture persisted: $(du -b /tmp/ci-ws/pt-C.pkl | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - pt-C.pkl
+  go1-21-test:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pick up handoff
+          command: |
+            test -s /tmp/ci-ws/pt-C.pkl && echo nonempty || echo empty
+      - run:
+          name: Prepare source
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME .
+      - run:
+          name: Unpack build archive
+          command: tar -xJf app-pkg.tar.xz
+      - run:
+          name: Package artifacts
+          no_output_timeout: 15m
+          command: sleep 120
+      - run:
+          name: Cooldown
+          command: env | wc -l
+      - run:
+          name: Collect artifacts
+          command: cmake --version
+      - run:
+          no_output_timeout: 119m
+          command: $PWD/release-run
+  package_jess-run:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Collect env snapshot
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; seq 1 164570 | awk '{print $1*$1}' | sha1sum | cut -c1-24; true ; } > /tmp/ci-ws/853.txt
+            echo "fixture persisted: $(du -b /tmp/ci-ws/853.txt | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - 853.txt
+  jess-run:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pick up handoff
+          command: |
+            test -s /tmp/ci-ws/853.txt && echo nonempty || echo empty
+      - run:
+          name: Prepare source
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME .
+      - run:
+          name: Unpack build archive
+          command: tar -xJf app-pkg.tar.xz
+      - run:
+          name: Package artifacts
+          no_output_timeout: 15m
+          command: sleep 120
+      - run:
+          name: Cooldown
+          command: env | wc -l
+      - run:
+          name: Collect artifacts
+          command: cmake --version
+      - run:
+          no_output_timeout: 119m
+          command: $PWD/release-run
+  g1_biuld:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Materialize sort order
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; seq 1 134894 | tr '0-9' 'a-j' | wc -c; true ; } > /tmp/ci-ws/2023-11-22.data
+            echo "fixture persisted: $(du -b /tmp/ci-ws/2023-11-22.data | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - 2023-11-22.data
+  biuld:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pick up handoff
+          command: |
+            test -s /tmp/ci-ws/2023-11-22.data && echo nonempty || echo empty
+      - run:
+          name: Prepare source
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME .
+      - run:
+          name: Unpack build archive
+          command: tar -xJf app-pkg.tar.xz
+      - run:
+          name: Package artifacts
+          no_output_timeout: 15m
+          command: sleep 120
+      - run:
+          name: Cooldown
+          command: env | wc -l
+      - run:
+          name: Collect artifacts
+          command: cmake --version
+      - run:
+          no_output_timeout: 119m
+          command: $PWD/release-run
+  precheck_node20-lint:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Measure entropy sample
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; seq 2 50451 | awk '{for(i=2;i*i<=$1;i++)if($1%i==0){next}print}' | wc -l; true ; } > /tmp/ci-ws/step-20.out
+            echo "fixture persisted: $(du -b /tmp/ci-ws/step-20.out | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - step-20.out
+  node20-lint:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pick up handoff
+          command: |
+            test -s /tmp/ci-ws/step-20.out && echo nonempty || echo empty
+      - run:
+          name: Prepare source
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME .
+      - run:
+          name: Unpack build archive
+          command: tar -xJf app-pkg.tar.xz
+      - run:
+          name: Package artifacts
+          no_output_timeout: 15m
+          command: sleep 120
+      - run:
+          name: Cooldown
+          command: env | wc -l
+      - run:
+          name: Collect artifacts
+          command: cmake --version
+      - run:
+          no_output_timeout: 119m
+          command: $PWD/release-run
+  retry_alpha:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Normalize vendor data
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; cat /dev/urandom | tr -dc '[:xdigit:]' | head -c 21504 | wc -c; true ; } > /tmp/ci-ws/2024-11-25.data
+            echo "fixture persisted: $(du -b /tmp/ci-ws/2024-11-25.data | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - 2024-11-25.data
+  alpha:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pick up handoff
+          command: |
+            test -s /tmp/ci-ws/2024-11-25.data && echo nonempty || echo empty
+      - run:
+          name: Prepare source
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME .
+      - run:
+          name: Unpack build archive
+          command: tar -xJf app-pkg.tar.xz
+      - run:
+          name: Package artifacts
+          no_output_timeout: 15m
+          command: sleep 120
+      - run:
+          name: Cooldown
+          command: env | wc -l
+      - run:
+          name: Collect artifacts
+          command: cmake --version
+      - run:
+          no_output_timeout: 119m
+          command: $PWD/release-run
+  warmup_promote:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: Scan prime offsets
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; awk 'BEGIN{for(i=0;i<168023;i++){s=sprintf("%d",i*13); for(j=1;j<=length(s);j++)c++};print c}'; true ; } > /tmp/ci-ws/summary.txt
+            echo "fixture persisted: $(du -b /tmp/ci-ws/summary.txt | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - summary.txt
+  promote:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pick up handoff
+          command: |
+            test -s /tmp/ci-ws/summary.txt && echo nonempty || echo empty
+      - run:
+          name: Prepare source
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME .
+      - run:
+          name: Unpack build archive
+          command: tar -xJf app-pkg.tar.xz
+      - run:
+          name: Package artifacts
+          no_output_timeout: 15m
+          command: sleep 120
+      - run:
+          name: Cooldown
+          command: env | wc -l
+      - run:
+          name: Collect artifacts
+          command: cmake --version
+      - run:
+          no_output_timeout: 119m
+          command: $PWD/release-run
+  package_sirius-ng:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pack vendor fragments
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; awk 'BEGIN{for(a=1;a<=8;a++)for(b=1;b<=24835;b++)s+=a*b;print s}'; true ; } > /tmp/ci-ws/payload.pkg
+            echo "fixture persisted: $(du -b /tmp/ci-ws/payload.pkg | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - payload.pkg
+  sirius-ng:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pick up handoff
+          command: |
+            test -s /tmp/ci-ws/payload.pkg && echo nonempty || echo empty
+      - run:
+          name: Prepare source
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME .
+      - run:
+          name: Unpack build archive
+          command: tar -xJf app-pkg.tar.xz
+      - run:
+          name: Package artifacts
+          no_output_timeout: 15m
+          command: sleep 120
+      - run:
+          name: Cooldown
+          command: env | wc -l
+      - run:
+          name: Collect artifacts
+          command: cmake --version
+      - run:
+          no_output_timeout: 119m
+          command: $PWD/release-run
+  sys_sierra:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Mirror arena state
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; awk 'BEGIN{for(i=0;i<73068;i++){s=sprintf("%d",i*13); for(j=1;j<=length(s);j++)c++};print c}'; true ; } > /tmp/ci-ws/payload.tar
+            echo "fixture persisted: $(du -b /tmp/ci-ws/payload.tar | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - payload.tar
+  sierra:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pick up handoff
+          command: |
+            test -s /tmp/ci-ws/payload.tar && echo nonempty || echo empty
+      - run:
+          name: Prepare source
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME .
+      - run:
+          name: Unpack build archive
+          command: tar -xJf app-pkg.tar.xz
+      - run:
+          name: Package artifacts
+          no_output_timeout: 15m
+          command: sleep 120
+      - run:
+          name: Cooldown
+          command: env | wc -l
+      - run:
+          name: Collect artifacts
+          command: cmake --version
+      - run:
+          no_output_timeout: 119m
+          command: $PWD/release-run
+  ctx2_bravo:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Collect retire counts
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; seq 1 352683 | awk '{if($1%2)o++;else e++}END{print o"/"e}'; true ; } > /tmp/ci-ws/event.ndjson
+            echo "fixture persisted: $(du -b /tmp/ci-ws/event.ndjson | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - event.ndjson
+  bravo:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pick up handoff
+          command: |
+            test -s /tmp/ci-ws/event.ndjson && echo nonempty || echo empty
+      - run:
+          name: Prepare source
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME .
+      - run:
+          name: Unpack build archive
+          command: tar -xJf app-pkg.tar.xz
+      - run:
+          name: Package artifacts
+          no_output_timeout: 15m
+          command: sleep 120
+      - run:
+          name: Cooldown
+          command: env | wc -l
+      - run:
+          name: Collect artifacts
+          command: cmake --version
+      - run:
+          no_output_timeout: 119m
+          command: $PWD/release-run
+  sys_refactor-5311:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Shape kernel ring
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; awk 'BEGIN{for(i=0;i<487569;i++){s=sprintf("%d",i*13); for(j=1;j<=length(s);j++)c++};print c}'; true ; } > /tmp/ci-ws/event.txt
+            echo "fixture persisted: $(du -b /tmp/ci-ws/event.txt | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - event.txt
+  refactor-5311:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pick up handoff
+          command: |
+            test -s /tmp/ci-ws/event.txt && echo nonempty || echo empty
+      - run:
+          name: Prepare source
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME .
+      - run:
+          name: Unpack build archive
+          command: tar -xJf app-pkg.tar.xz
+      - run:
+          name: Package artifacts
+          no_output_timeout: 15m
+          command: sleep 120
+      - run:
+          name: Cooldown
+          command: env | wc -l
+      - run:
+          name: Collect artifacts
+          command: cmake --version
+      - run:
+          no_output_timeout: 119m
+          command: $PWD/release-run
+  A_check-full-release-candidate:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Scan vector span
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; awk 'BEGIN{for(a=1;a<=5;a++)for(b=1;b<=21084;b++)s+=a*b;print s}'; true ; } > /tmp/ci-ws/result.md
+            echo "fixture persisted: $(du -b /tmp/ci-ws/result.md | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - result.md
+  check-full-release-candidate:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large.gen2
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Pick up handoff
+          command: |
+            test -s /tmp/ci-ws/result.md && echo nonempty || echo empty
+      - run:
+          name: Prepare source
+          command: git clone --depth 3 -q --no-single-branch --filter=blob:none https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME .
+      - run:
+          name: Unpack build archive
+          command: tar -xJf app-pkg.tar.xz
+      - run:
+          name: Package artifacts
+          no_output_timeout: 15m
+          command: sleep 120
+      - run:
+          name: Cooldown
+          command: env | wc -l
+      - run:
+          name: Collect artifacts
+          command: cmake --version
+      - run:
+          no_output_timeout: 119m
+          command: $PWD/release-run
+
+  do_refactor-5311_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Chunk raw buffer
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; seq 1 491325 | awk '{if($1%97==0)c++}END{print c}'; true ; } > /tmp/ci-ws/event.txt
+            echo "fixture persisted: $(du -b /tmp/ci-ws/event.txt | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - event.txt
+  cacher_ci-3_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Deflate payload chunk
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; dd if=/dev/zero bs=1M count=14 2>/dev/null | gzip -9 | wc -c; true ; } > /tmp/ci-ws/.marker
+            echo "fixture persisted: $(du -b /tmp/ci-ws/.marker | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - .marker
+  bake_biuld_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Freeze working set
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; ( for i in $(seq 1 18649); do printf "%08x\n" $RANDOM; done ) | sort | md5sum; true ; } > /tmp/ci-ws/2023-11-22.data
+            echo "fixture persisted: $(du -b /tmp/ci-ws/2023-11-22.data | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - 2023-11-22.data
+  red_sierra_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Expand parameter grid
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; cat /dev/urandom | tr -dc 'a-f0-9' | head -c 92160 | fold -w16 | awk '!seen[$0]++' | wc -l; true ; } > /tmp/ci-ws/payload.tar
+            echo "fixture persisted: $(du -b /tmp/ci-ws/payload.tar | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - payload.tar
+  precheck_victor-2_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Spool byte frames
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; tr -dc '0-9' </dev/urandom | head -c 2150400 | wc -c; true ; } > /tmp/ci-ws/checkpoint-C.state
+            echo "fixture persisted: $(du -b /tmp/ci-ws/checkpoint-C.state | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - checkpoint-C.state
+  produce_aug17-smoke_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Score sort stability
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; awk 'BEGIN{for(i=0;i<63061;i++) printf "%d\n", (i*7919)%2147483647}' | wc -l; true ; } > /tmp/ci-ws/relay.ok
+            echo "fixture persisted: $(du -b /tmp/ci-ws/relay.ok | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - relay.ok
+  fetch_biuld-34_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Flush pipeline cache
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; awk 'BEGIN{for(i=1;i<=14727;i++){x=sqrt(i);y=int(x);if(y*y==i)c++}print c}'; true ; } > /tmp/ci-ws/step-complete.sig
+            echo "fixture persisted: $(du -b /tmp/ci-ws/step-complete.sig | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - step-complete.sig
+  reset_update-login-glitch_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Collect gauge frames
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; tr -dc 'A-Za-z0-9' </dev/urandom | head -c 81920 | fold -w40 | sort | uniq -c | wc -l; true ; } > /tmp/ci-ws/2024-01-01.data
+            echo "fixture persisted: $(du -b /tmp/ci-ws/2024-01-01.data | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - 2024-01-01.data
+  inspect_node20-lint_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Prepare block cipher
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; tr -dc 'a-z' </dev/urandom | head -c 33554432 | fold -w16 | sort -u | wc -l; true ; } > /tmp/ci-ws/step-20.out
+            echo "fixture persisted: $(du -b /tmp/ci-ws/step-20.out | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - step-20.out
+  blue_alpha_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Record manifest digest
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; dd if=/dev/zero bs=1M count=26 2>/dev/null | sha256sum; true ; } > /tmp/ci-ws/2024-11-25.data
+            echo "fixture persisted: $(du -b /tmp/ci-ws/2024-11-25.data | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - 2024-11-25.data
+  stepA_biuld-86_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Flush temp bucket
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; cat /dev/urandom | tr -dc 'a-f0-9' | head -c 276480 | fold -w16 | awk '!seen[$0]++' | wc -l; true ; } > /tmp/ci-ws/737a.out
+            echo "fixture persisted: $(du -b /tmp/ci-ws/737a.out | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - 737a.out
+  loader_sirius-ng_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Harvest random seed
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; dd if=/dev/urandom bs=4k count=50 2>/dev/null | md5sum; true ; } > /tmp/ci-ws/payload.pkg
+            echo "fixture persisted: $(du -b /tmp/ci-ws/payload.pkg | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - payload.pkg
+  inspect_API-645_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Capture job identity
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; seq 1 434257 | awk '{if($1%97==0)c++}END{print c}'; true ; } > /tmp/ci-ws/handover.sig
+            echo "fixture persisted: $(du -b /tmp/ci-ws/handover.sig | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - handover.sig
+  C_ken-build_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Measure throughput
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; cat /dev/urandom | head -c 1536000 | base64 | head -c 200 | wc -c; true ; } > /tmp/ci-ws/final.log
+            echo "fixture persisted: $(du -b /tmp/ci-ws/final.log | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - final.log
+  env_hu-run_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Interleave stream pairs
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; awk 'BEGIN{for(i=0;i<267077;i++){s=(s*33+i)%2147483647}print s}'; true ; } > /tmp/ci-ws/2024-03-16.data
+            echo "fixture persisted: $(du -b /tmp/ci-ws/2024-03-16.data | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - 2024-03-16.data
+  spin_artifacts_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Checkpoint context
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; seq 1 2000 | awk '{print toupper($0)}' | md5sum; true ; } > /tmp/ci-ws/metrics.tsv
+            echo "fixture persisted: $(du -b /tmp/ci-ws/metrics.tsv | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - metrics.tsv
+  sys_check-full-release-candidate_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Walk directory tree
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; seq 1 276351 | awk 'NR>19685 && NR<50200{s+=$1}END{print s}'; true ; } > /tmp/ci-ws/result.md
+            echo "fixture persisted: $(du -b /tmp/ci-ws/result.md | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - result.md
+  enqueue_v4-rc_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Measure branch cost
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; seq 2 57400 | factor | wc -l; true ; } > /tmp/ci-ws/step-28.out
+            echo "fixture persisted: $(du -b /tmp/ci-ws/step-28.out | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - step-28.out
+  phase1_cook-it_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Rotate build log
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; seq 1 410749 | awk '{if($1%2)o++;else e++}END{print o"/"e}'; true ; } > /tmp/ci-ws/relay.sig
+            echo "fixture persisted: $(du -b /tmp/ci-ws/relay.sig | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - relay.sig
+  linter_go1-21-test_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Rebase partial order
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; awk 'BEGIN{for(i=0;i<29109;i++) printf "%d\n", (i*7919)%2147483647}' | wc -l; true ; } > /tmp/ci-ws/pt-C.pkl
+            echo "fixture persisted: $(du -b /tmp/ci-ws/pt-C.pkl | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - pt-C.pkl
+  prep_promote_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: Measure dwell time
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; head -c 16777216 /dev/urandom | sha256sum; true ; } > /tmp/ci-ws/summary.txt
+            echo "fixture persisted: $(du -b /tmp/ci-ws/summary.txt | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - summary.txt
+  rerun_RUN_QA_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: Shape histogram head
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; awk 'BEGIN{for(a=1;a<=9;a++)for(b=1;b<=1881;b++)s+=a*b;print s}'; true ; } > /tmp/ci-ws/step-ok.out
+            echo "fixture persisted: $(du -b /tmp/ci-ws/step-ok.out | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - step-ok.out
+  warmup_alpha-v1_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: Trim trailing newlines
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; ( echo "init"; for i in $(seq 1 29533); do echo "line $i"; done ) | sort | md5sum; true ; } > /tmp/ci-ws/.sig
+            echo "fixture persisted: $(du -b /tmp/ci-ws/.sig | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - .sig
+  preinit_send-it_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - run:
+          name: Compute aggregate hash
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; ( for i in $(seq 1 51873); do printf "%d\n" $i; done ) | sort -n | tail -1; true ; } > /tmp/ci-ws/stats.csv
+            echo "fixture persisted: $(du -b /tmp/ci-ws/stats.csv | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - stats.csv
+  warmer_jess-run_2:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: /tmp/ci-ws
+      - run:
+          name: Verify fixture integrity
+          command: |
+            mkdir -p /tmp/ci-ws
+            { set +o pipefail 2>/dev/null; seq 1 1600 | awk '{print toupper($0)}' | md5sum; true ; } > /tmp/ci-ws/853.txt
+            echo "fixture persisted: $(du -b /tmp/ci-ws/853.txt | awk '{print $1}')b"
+      - persist_to_workspace:
+          root: /tmp/ci-ws
+          paths:
+            - 853.txt
+workflows:
+  all:
+    jobs:
+      - sys_refactor-5311
+      - do_refactor-5311_2:
+          requires:
+            - sys_refactor-5311
+      - refactor-5311:
+          requires:
+            - do_refactor-5311_2
+      - stepB_ci-3:
+          requires:
+            - do_refactor-5311_2
+      - cacher_ci-3_2:
+          requires:
+            - stepB_ci-3
+      - ci-3:
+          requires:
+            - cacher_ci-3_2
+      - g1_biuld:
+          requires:
+            - cacher_ci-3_2
+      - bake_biuld_2:
+          requires:
+            - g1_biuld
+      - biuld:
+          requires:
+            - bake_biuld_2
+      - sys_sierra:
+          requires:
+            - bake_biuld_2
+      - red_sierra_2:
+          requires:
+            - sys_sierra
+      - sierra:
+          requires:
+            - red_sierra_2
+      - alpha_victor-2:
+          requires:
+            - red_sierra_2
+      - precheck_victor-2_2:
+          requires:
+            - alpha_victor-2
+      - victor-2:
+          requires:
+            - precheck_victor-2_2
+      - bake_aug17-smoke:
+          requires:
+            - precheck_victor-2_2
+      - produce_aug17-smoke_2:
+          requires:
+            - bake_aug17-smoke
+      - aug17-smoke:
+          requires:
+            - produce_aug17-smoke_2
+      - spin_biuld-34:
+          requires:
+            - produce_aug17-smoke_2
+      - fetch_biuld-34_2:
+          requires:
+            - spin_biuld-34
+      - biuld-34:
+          requires:
+            - fetch_biuld-34_2
+      - hydrate_update-login-glitch:
+          requires:
+            - fetch_biuld-34_2
+      - reset_update-login-glitch_2:
+          requires:
+            - hydrate_update-login-glitch
+      - update-login-glitch:
+          requires:
+            - reset_update-login-glitch_2
+      - precheck_node20-lint:
+          requires:
+            - reset_update-login-glitch_2
+      - inspect_node20-lint_2:
+          requires:
+            - precheck_node20-lint
+      - node20-lint:
+          requires:
+            - inspect_node20-lint_2
+      - retry_alpha
+      - blue_alpha_2:
+          requires:
+            - retry_alpha
+      - alpha:
+          requires:
+            - blue_alpha_2
+      - gamma_biuld-86:
+          requires:
+            - blue_alpha_2
+      - stepA_biuld-86_2:
+          requires:
+            - gamma_biuld-86
+      - biuld-86:
+          requires:
+            - stepA_biuld-86_2
+      - package_sirius-ng:
+          requires:
+            - stepA_biuld-86_2
+      - loader_sirius-ng_2:
+          requires:
+            - package_sirius-ng
+      - sirius-ng:
+          requires:
+            - loader_sirius-ng_2
+      - reserve_API-645:
+          requires:
+            - loader_sirius-ng_2
+      - inspect_API-645_2:
+          requires:
+            - reserve_API-645
+      - API-645:
+          requires:
+            - inspect_API-645_2
+      - maker_ken-build:
+          requires:
+            - inspect_API-645_2
+      - C_ken-build_2:
+          requires:
+            - maker_ken-build
+      - ken-build:
+          requires:
+            - C_ken-build_2
+      - fetcher_fire-up
+      - fire-up:
+          requires:
+            - fetcher_fire-up
+      - Delta_succes-only:
+          requires:
+            - fetcher_fire-up
+      - succes-only:
+          requires:
+            - Delta_succes-only
+      - ctx2_bravo:
+          requires:
+            - Delta_succes-only
+      - bravo:
+          requires:
+            - ctx2_bravo
+      - env_callisto-alpha:
+          requires:
+            - ctx2_bravo
+      - callisto-alpha:
+          requires:
+            - env_callisto-alpha
+      - fetch_hotfix-4998:
+          requires:
+            - env_callisto-alpha
+      - hotfix-4998:
+          requires:
+            - fetch_hotfix-4998
+      - ctx2_hu-run
+      - env_hu-run_2:
+          requires:
+            - ctx2_hu-run
+      - hu-run:
+          requires:
+            - env_hu-run_2
+      - install_artifacts:
+          requires:
+            - env_hu-run_2
+      - spin_artifacts_2:
+          requires:
+            - install_artifacts
+      - artifacts:
+          requires:
+            - spin_artifacts_2
+      - A_check-full-release-candidate:
+          requires:
+            - spin_artifacts_2
+      - sys_check-full-release-candidate_2:
+          requires:
+            - A_check-full-release-candidate
+      - check-full-release-candidate:
+          requires:
+            - sys_check-full-release-candidate_2
+      - fetcher_v4-rc:
+          requires:
+            - sys_check-full-release-candidate_2
+      - enqueue_v4-rc_2:
+          requires:
+            - fetcher_v4-rc
+      - v4-rc:
+          requires:
+            - enqueue_v4-rc_2
+      - spinner_cook-it
+      - phase1_cook-it_2:
+          requires:
+            - spinner_cook-it
+      - cook-it:
+          requires:
+            - phase1_cook-it_2
+      - rerun_go1-21-test:
+          requires:
+            - phase1_cook-it_2
+      - linter_go1-21-test_2:
+          requires:
+            - rerun_go1-21-test
+      - go1-21-test:
+          requires:
+            - linter_go1-21-test_2
+      - warmup_promote:
+          requires:
+            - linter_go1-21-test_2
+      - prep_promote_2:
+          requires:
+            - warmup_promote
+      - promote:
+          requires:
+            - prep_promote_2
+      - reup_RUN_QA:
+          requires:
+            - prep_promote_2
+      - rerun_RUN_QA_2:
+          requires:
+            - reup_RUN_QA
+      - RUN_QA:
+          requires:
+            - rerun_RUN_QA_2
+      - reup_alpha-v1:
+          requires:
+            - rerun_RUN_QA_2
+      - warmup_alpha-v1_2:
+          requires:
+            - reup_alpha-v1
+      - alpha-v1:
+          requires:
+            - warmup_alpha-v1_2
+      - auditor_send-it:
+          requires:
+            - warmup_alpha-v1_2
+      - preinit_send-it_2:
+          requires:
+            - auditor_send-it
+      - send-it:
+          requires:
+            - preinit_send-it_2
+      - package_jess-run:
+          requires:
+            - preinit_send-it_2
+      - warmer_jess-run_2:
+          requires:
+            - package_jess-run
+      - jess-run:
+          requires:
+            - warmer_jess-run_2
